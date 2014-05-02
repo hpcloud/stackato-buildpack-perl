@@ -36,6 +36,16 @@ If your application contains an `app.psgi` file, then this buildpack
 will generate a default start command using [uWSGI][] as the [PSGI
 server][].
 
+## Log files
+
+The Carton and PPM log files are stored with the generated droplet and
+can be inspected with:
+
+```
+$ stackato files . logs/cpanm.log
+$ stackato files . logs/ppm4.log
+```
+
 ## Minimal example
 
 The smallest example consists of just a single `app.psgi` file:
