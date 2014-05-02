@@ -29,6 +29,10 @@ The `--cached` option will be added to the `carton` install commands
 if dependencies have been [bundled][] with the application in the
 `vendor/cache/` directory,
 
+Specifying PPM requirements inside the [stackato.yml][] file is not
+supported by this buildpack.  That feature is only implemented in the
+[legacy buildpack][] for backwards compatibility with Stackato 2.
+
 PPM and Carton can be used together, but Carton will not "see" any
 modules installed by PPM, so might install them again.
 
@@ -60,12 +64,14 @@ sub {
 
 This buildpack is released under version 2.0 of the [Apache License][].
 
-[Apache License]: http://www.apache.org/licenses/LICENSE-2.0
-[ActivePerl]:     http://www.activestate.com/activeperl
-[ActiveState]:    http://www.activestate.com
-[bundled]:        https://metacpan.org/pod/Carton#Bundling-modules
-[Carton]:         https://metacpan.org/pod/Carton
-[Stackato]:       http://www.activestate.com/stackato
-[PPM]:            http://code.activestate.com/ppm/
-[PSGI server]:    http://plackperl.org/#servers
-[uWSGI]:          http://uwsgi-docs.readthedocs.org/en/latest/
+[Apache License]:   http://www.apache.org/licenses/LICENSE-2.0
+[ActivePerl]:       http://www.activestate.com/activeperl
+[ActiveState]:      http://www.activestate.com
+[bundled]:          https://metacpan.org/pod/Carton#Bundling-modules
+[Carton]:           https://metacpan.org/pod/Carton
+[legacy buildpack]: http://docs.stackato.com/user/deploy/buildpack.html#legacy-buildpack
+[Stackato]:         http://www.activestate.com/stackato
+[stackato.yml]:     http://docs.stackato.com/2.10/deploy/languages/perl/index.html#cpan-modules-via-ppm
+[PPM]:              http://code.activestate.com/ppm/
+[PSGI server]:      http://plackperl.org/#servers
+[uWSGI]:            http://uwsgi-docs.readthedocs.org/en/latest/
