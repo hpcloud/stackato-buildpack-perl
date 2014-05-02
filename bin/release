@@ -1,0 +1,12 @@
+#!/opt/perl/bin/perl
+
+use 5.016;
+use warnings;
+
+my $BUILD_DIR = shift;
+
+say "---";
+if (-f "$BUILD_DIR/app.psgi") {
+    say "default_process_types:";
+    say "  web: \$UWSGI app.psgi";
+}

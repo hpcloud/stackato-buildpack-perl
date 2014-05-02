@@ -1,0 +1,98 @@
+#!/opt/perl/bin/perl
+
+use 5.016;
+use warnings;
+
+use File::Path qw(make_path);
+
+my $BUILD_DIR = shift;
+chdir($BUILD_DIR) or die;
+unlink "$ENV{HOME}/.ActivePerl/ppm4.log";
+
+sub run {
+    my($cmd) = @_;
+    my $ignore_error = $cmd =~ s/^-//;
+    open(my $fh, "$cmd 2>&1 |") or die $!;
+    print "       $_" while <$fh>;
+    close($fh);
+    die "Command returned exit code $?: '$cmd'\n" if $? && !$ignore_error;
+}
+
+sub ppm_init {
+    run "ppm config install_html 0";
+    run "ppm config repo_dbimage 1";
+    run "ppm repo sync";
+}
+
+my(@bin,@lib);
+
+if (-f "requirements.ppm") {
+    open(my $fh, "<", "requirements.ppm") or die;
+    my @pkgs;
+    while (<$fh>) {
+        chomp;
+        push @pkgs, $_ if length && !/^\s*#/;
+    }
+
+    if (@pkgs) {
+        print "-----> Installing modules from requirements.ppm\n";
+
+        push @bin, ".ppm/bin";
+        push @lib, ".ppm/lib";
+
+        $ENV{PERL5LIB} = "$BUILD_DIR/.ppm/lib";
+        make_path $ENV{PERL5LIB};
+
+        ppm_init;
+        run "ppm area init .ppm";
+        run "ppm install @pkgs --no-sync --area .ppm";
+    }
+}
+
+if (-f "cpanfile" || -f "cpanfile.snapshot") {
+    print "-----> Installing latest Carton from PPM\n";
+
+    $ENV{PERL5LIB} = "/tmp/ppm/lib";
+    make_path $ENV{PERL5LIB};
+    $ENV{PERL5LIB} .= ":$BUILD_DIR/.ppm/lib";
+    $ENV{PATH} = "/tmp/ppm/bin:$ENV{PATH}";
+
+    require Module::CoreList;
+    ppm_init;
+    run "ppm area init ppm";
+    # ActivePerl 5.16.3 includes Module::CoreList 2.80, which doesn't cover Perl 5.16.3
+    run "ppm install Module::CoreList --force --no-sync --area ppm" if $Module::CoreList::VERSION <= 2.80;
+    run "ppm install Carton --no-sync --area ppm";
+
+    print "-----> Installing modules with ", qx(carton -v);
+
+    unshift @bin, "local/bin";
+    unshift @lib, "local/lib/perl5";
+
+    $ENV{PERL5LIB} = "$BUILD_DIR/local/perl5/lib:$ENV{PERL5LIB}";
+
+    my $cmd = "carton install";
+    $cmd .= " --deployment" if -f "cpanfile.snapshot";
+    $cmd .= " --cached" if -d "vendor/cache";
+    run $cmd;
+
+    run "rm -rf local/cache/ vendor/cache/";
+}
+
+# XXX assumes staging logs are collected at $BUILD_DIR/../logs
+run "cp $ENV{HOME}/.ActivePerl/ppm4.log ../logs" if -f "$ENV{HOME}/.ActivePerl/ppm4.log";
+run "cp $ENV{HOME}/.cpanm/build.log ../logs/cpanm.log" if -f "$ENV{HOME}/.cpanm/build.log";
+
+my @uwsgi_options = qw(--reaper --vacuum --single-interpreter --master --processes 1
+                       --remap-modifier 5:0 --http-socket=0.0.0.0:$PORT
+                       --perl-no-die-catch --psgi);
+my %env;
+$env{PATH}     = join ":", map("\$HOME/$_", @bin), qw(/opt/perl/site/bin /opt/perl/bin $PATH);
+$env{PERL5LIB} = join ":", map("\$HOME/$_", @lib);
+$env{UWSGI}    = "/opt/perl/bin/uwsgi @uwsgi_options";
+
+mkdir ".profile.d";
+open(my $fh, ">", ".profile.d/perl.sh") or die;
+for my $key (keys %env) {
+    print $fh qq(export $key="$env{$key}"\n) if $env{$key};
+}

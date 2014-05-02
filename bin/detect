@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+BUILD_DIR=$1
+
+if [ -f $BUILD_DIR/cpanfile.snapshot ]; then
+    echo Perl
+    exit 0
+fi
+
+if [ -f $BUILD_DIR/requirements.ppm ]; then
+    echo Perl
+    exit 0
+fi
+
+if [ -f $BUILD_DIR/app.psgi ]; then
+    echo Perl
+    exit 0
+fi
+
+exit 1
