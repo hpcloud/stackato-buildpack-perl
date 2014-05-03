@@ -29,7 +29,7 @@ The `--cached` option will be added to the `carton` install commands
 if dependencies have been [bundled][] with the application in the
 `vendor/cache/` directory,
 
-Specifying PPM requirements inside the [stackato.yml][] file is not
+Specifying module requirements inside the [stackato.yml][] file is not
 supported by this buildpack.  That feature is only implemented in the
 [legacy buildpack][] for backwards compatibility with Stackato 2.
 
@@ -45,20 +45,27 @@ server][].
 The Carton and PPM log files are stored with the generated droplet and
 can be inspected with:
 
-```
+```bash
 $ stackato files . logs/cpanm.log
 $ stackato files . logs/ppm4.log
 ```
 
-## Minimal example
+## Examples
 
-The smallest example consists of just a single `app.psgi` file:
+A minimal example could consist of just a single `app.psgi` file:
 
 ```perl
 sub {
   return ['200', ['Content-Type' => 'text/plain'], ['Hello World']];
 };
 ```
+
+More functional samples can be found under the [Stackato-Apps][] organization on Github:
+
+| Sample App | Details |
+| ---------- | ------- |
+| [mojo-scalingdemo][] | Mojolicious app; uses Carton to install modules. |
+| [perlcritic.com][] | Installs prerequisites via PPM; uses Plack as PSGI server. |
 
 ## License
 
@@ -70,7 +77,10 @@ This buildpack is released under version 2.0 of the [Apache License][].
 [bundled]:          https://metacpan.org/pod/Carton#Bundling-modules
 [Carton]:           https://metacpan.org/pod/Carton
 [legacy buildpack]: http://docs.stackato.com/user/deploy/buildpack.html#legacy-buildpack
+[mojo-scalingdemo]: https://github.com/Stackato-Apps/mojo-scalingdemo
+[perlcritic.com]:   https://github.com/Stackato-Apps/perlcritic.com
 [Stackato]:         http://www.activestate.com/stackato
+[Stackato-Apps]:    https://github.com/Stackato-Apps
 [stackato.yml]:     http://docs.stackato.com/2.10/deploy/languages/perl/index.html#cpan-modules-via-ppm
 [PPM]:              http://code.activestate.com/ppm/
 [PSGI server]:      http://plackperl.org/#servers
