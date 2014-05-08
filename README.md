@@ -18,12 +18,12 @@ stackato push <APPNAME> -n --buildpack https://github.com/ActiveState/stackato-b
 At least one of the following files must exist to identify your app as
 a Perl application:
 
-| Filename            | Usage |
-| ------------------- | ----- |
-| `app.psgi`          | Indicates this a Perl application. Only needed when none of the other files exist. |
-| `cpanfile.snapshot` | Install dependencies with `carton --deployment`. |
-| `cpanfile`          |  Ignored if `cpanfile.snapshot` exists as well.  Otherwise install dependencies with `carton`. |
-| `requirements.ppm`  |  A simple text file listing required PPM package names; installed with `ppm`. |
+Filename            | Usage
+------------------- | -----
+`app.psgi`          | Indicates this a Perl application. Only needed when none of the other files exist.
+`cpanfile.snapshot` | Install dependencies with `carton --deployment`.
+`cpanfile`          | Ignored if `cpanfile.snapshot` exists as well. Otherwise install dependencies with `carton`.
+`requirements.ppm`  | A simple text file listing required PPM package names; installed with `ppm`.
 
 The `--cached` option will be added to the `carton` install commands
 if dependencies have been [bundled][] with the application in the
@@ -62,10 +62,10 @@ sub {
 
 More functional samples can be found under the [Stackato-Apps][] organization on Github:
 
-| Sample App | Details |
-| ---------- | ------- |
-| [mojo-scalingdemo][] | Mojolicious app; uses Carton to install modules. |
-| [perlcritic.com][] | Installs prerequisites via PPM; uses Plack as PSGI server. |
+Sample App           | Details
+-------------------- | -------
+[mojo-scalingdemo][] | Mojolicious app; uses Carton to install modules.
+[perlcritic.com][]   | Installs prerequisites via PPM; uses Plack as PSGI server.
 
 ## License
 
