@@ -4,6 +4,7 @@ use 5.016;
 use warnings;
 
 use File::Path qw(make_path);
+use File::Find qw(find);
 
 my $BUILD_DIR = shift;
 chdir($BUILD_DIR) or die;
@@ -74,7 +75,16 @@ if (-f "cpanfile" || -f "cpanfile.snapshot") {
     my $cmd = "carton install";
     $cmd .= " --deployment" if -f "cpanfile.snapshot";
     $cmd .= " --cached" if -d "vendor/cache";
-    run $cmd;
+    run "-$cmd";
+    if (my $exitcode = $?) {
+        find(sub {
+                 return unless -f && /\.log$/;
+                 my $cmd = "cat $File::Find::name";
+                 print "-----> $cmd\n";
+                 run($cmd);
+             }, "$ENV{HOME}/.cpanm");
+        die "carton failed with exit code $exitcode\n";
+    }
 
     run "rm -rf local/cache/ vendor/cache/";
 }
